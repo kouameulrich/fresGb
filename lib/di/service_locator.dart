@@ -5,6 +5,7 @@ import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/database.connection.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/db/repository.dart';
+import 'package:appfres/misc/printer.service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -22,4 +23,5 @@ Future<void> setup() async {
   locator.registerSingleton(DatabaseConnection());
   locator.registerSingleton(Repository(locator<DatabaseConnection>()));
   locator.registerSingleton(LocalService(locator<Repository>()));
+  locator.registerSingleton(PrinterService());
 }

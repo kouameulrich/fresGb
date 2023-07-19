@@ -1,19 +1,21 @@
-// ignore_for_file: prefer_const_constructors, sort_child_properties_last
+// ignore_for_file: use_build_context_synchronously
 
-import 'dart:developer';
+import 'dart:math';
 
 import 'package:appfres/_api/apiService.dart';
-import 'package:appfres/_api/authService.dart';
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
-import 'package:appfres/models/agent.dart';
+import 'package:appfres/models/dto/contract.dart';
+import 'package:appfres/models/dto/customer.dart';
+import 'package:appfres/models/payment.dart';
+import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/home.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
-import 'package:appfres/widgets/error.dialog.dart';
 import 'package:appfres/widgets/loading.indicator.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
+import '../../_api/authService.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -23,37 +25,40 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   final authService = locator<AuthService>();
-  final apiService = locator<ApiService>();
   final dbHandler = locator<LocalService>();
+  final apiService = locator<ApiService>();
   final storage = locator<TokenStorageService>();
-  final TextEditingController _tenantController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool notvisible = true;
-  Agent? agentConnected;
+  User? agentConnected;
   bool isLoading = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    _tenantController.dispose();
+    usernameController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Defaults.backgroundColorPage,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              SizedBox(
-                height: 100,
+              const SizedBox(
+                height: 20,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 40, bottom: 30),
@@ -86,16 +91,16 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   child: TextFormField(
-                    controller: _usernameController,
+                    controller: usernameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Entrer un nom utilisateur';
+                        return 'Entrez un nom d\'utilisateur';
                       }
                       return null;
                     },
                     decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Enter votre nom utilisateur'),
+                        hintText: 'Entrez votre nom d\'utilisateur'),
                   ),
                 ),
               ),
@@ -116,10 +121,10 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   child: TextFormField(
-                    controller: _passwordController,
+                    controller: passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Entrer un mot de passe';
+                        return 'Entrez un mot de passe';
                       }
                       return null;
                     },
@@ -135,14 +140,14 @@ class _LoginPageState extends State<LoginPage> {
                               });
                             }),
                         border: InputBorder.none,
-                        hintText: 'Entrer votre mot de passe'),
+                        hintText: 'Entrez votre mot de passe'),
                   ),
                 ),
               ),
               Padding(
                   padding: const EdgeInsets.only(
                       left: 15.0, right: 15.0, top: 35, bottom: 0),
-                  child: Container(
+                  child: SizedBox(
                     height: 50,
                     width: 500,
                     child: ElevatedButton(
@@ -166,20 +171,71 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _submitLogin() async {
     if (_formKey.currentState!.validate()) {
       LoadingIndicatorDialog().show(context);
-      log(_tenantController.text);
-      try {
-        var statusCode = await authService.authenticateUser(
-            _tenantController.text.trim(),
-            _usernameController.text.trim(),
-            _passwordController.text);
-        if (statusCode == 200) {
-          LoadingIndicatorDialog().dismiss();
-          Navigator.push(
-              context, MaterialPageRoute(builder: (_) => const HomePage()));
+      var statusCode = await authService.authenticateUser(
+          usernameController.text.trim(), passwordController.text.trim());
+      if (statusCode == 200) {
+        //load customer
+        List<Customer> customers = await apiService.getAllClients();
+        for (var customer in customers) {
+          dbHandler.SaveCustomer(customer);
+          for (var contract in customer.contracts) {
+            contract.client_id = customer.reference.toString();
+            dbHandler.SaveContract(contract);
+          }
         }
-      } on DioError catch (e) {
+
+        //load user
+        // List<User> users = await apiService.getAllUsers();
+        // for (var user in users) {
+        //   dbHandler.SaveUser(user);
+        // }
+
+        // //load contract
+        // List<Contract> contracts = await apiService.getAllContracts();
+        // for (var contract in contracts) {
+        //   dbHandler.SaveContract(contract);
+        // }
+
+        // //load payment
+        // List<Payment> payments = await apiService.getAllPayments();
+        // for (var payment in payments) {
+        //   dbHandler.SavePayment(payment);
+        // }
+
         LoadingIndicatorDialog().dismiss();
-        ErrorDialog().show(e);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => const HomePage()));
+      } else {
+        LoadingIndicatorDialog().dismiss();
+        return showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text(
+                  'ERROR',
+                  textAlign: TextAlign.center,
+                ),
+                content: const SizedBox(
+                  height: 120,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Nom d\'utilisateur ou mot de passe incorrect',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Réessayer'))
+                ],
+              );
+            });
       }
     }
   }

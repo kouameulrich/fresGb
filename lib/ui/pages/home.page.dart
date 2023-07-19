@@ -1,11 +1,9 @@
 // ignore_for_file: unused_field
-
-import 'package:appfres/_api/apiService.dart';
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
-import 'package:appfres/models/agent.dart';
-import 'package:appfres/models/encaissement.dart';
+import 'package:appfres/models/payment.dart';
+import 'package:appfres/models/user.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:appfres/widgets/mydrawer.dart';
 import 'package:flutter/material.dart';
@@ -21,20 +19,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<List<Encaissement>>? _futureEncaissement;
+  Future<List<Payment>>? _futureEncaissement;
   final dbHandler = locator<LocalService>();
-  final apiService = locator<ApiService>();
 
-  Future<List<Encaissement>> getAllEncaissement() async {
-    return await dbHandler.readAllEncaissement();
+  Future<List<Payment>> getAllPayment() async {
+    return await dbHandler.readAllPayment();
   }
 
   final storage = locator<TokenStorageService>();
-  late final Future<Agent?> _futureAgentConnected;
+  late final Future<User?> _futureAgentConnected;
   late TabController _tabController;
   int _countEquipementRecense = 0;
 
-  List<Encaissement> _Encaissement = [];
+  List<Payment> _Payment = [];
   int maleNumber = 0;
   int femaleNumber = 0;
   int _countEncaissement = 0;
@@ -66,19 +63,19 @@ class _HomePageState extends State<HomePage> {
 
     //Equipement recense
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      getAllEncaissement().then((value) => setState(() {
-            _Encaissement = value;
-            maleNumber = value
-                .where((element) => element.sexeClient == 'Masculin')
-                .toList()
-                .length;
-            femaleNumber = value
-                .where((element) => element.sexeClient == 'Feminin')
-                .toList()
-                .length;
-            _countEncaissement = _Encaissement.length;
-            _montantRecense = value.fold(0,
-                (value, element) => value.toDouble() + element.montantClient!);
+      getAllPayment().then((value) => setState(() {
+            _Payment = value;
+            // maleNumber = value
+            //     .where((element) => element.sexeClient == 'Masculin')
+            //     .toList()
+            //     .length;
+            // femaleNumber = value
+            //     .where((element) => element.sexeClient == 'Feminin')
+            //     .toList()
+            //     .length;
+            _countEncaissement = _Payment.length;
+            _montantRecense = value.fold(
+                0, (value, element) => value.toDouble() + element.amount!);
           }));
     });
     super.initState();
@@ -90,7 +87,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Future<Agent?> getAgent() async {
+  Future<User?> getAgent() async {
     return await storage.retrieveAgentConnected();
   }
 

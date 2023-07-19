@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
-import 'package:appfres/ui/pages/home.page.dart';
+import 'package:appfres/ui/pages/login.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -18,7 +18,7 @@ class _SplashScreen extends State<SplashScreen> {
   Widget build(BuildContext context) {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomePage()));
+          context, MaterialPageRoute(builder: (context) => LoginPage()));
     });
     return Scaffold(
       backgroundColor: Defaults.backgroundColorPage,

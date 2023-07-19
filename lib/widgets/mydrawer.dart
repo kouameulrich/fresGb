@@ -1,6 +1,6 @@
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/di/service_locator.dart';
-import 'package:appfres/models/agent.dart';
+import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/login.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ var indexClicked = 0;
 
 class _MyDrawerState extends State<MyDrawer> {
   final storage = locator<TokenStorageService>();
-  late final Future<Agent?> _futureAgentConnected;
+  late final Future<User?> _futureAgentConnected;
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _MyDrawerState extends State<MyDrawer> {
     super.initState();
   }
 
-  Future<Agent?> getAgent() async {
+  Future<User?> getAgent() async {
     return await storage.retrieveAgentConnected();
   }
 
@@ -41,43 +41,40 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               padding:
                   const EdgeInsets.only(left: 0, top: 10, bottom: 0, right: 0),
-              child: Container(
-                child: Column(
-                  children: [
-                    Icon(Icons.account_circle_rounded,
-                        size: 59, color: Colors.white),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    FutureBuilder<Agent?>(
-                        future: _futureAgentConnected,
-                        builder: (context, snapshot) {
-                          return Column(
-                            children: [
-                              Text(
+              child: Column(
+                children: [
+                  const Icon(Icons.account_circle_rounded,
+                      size: 59, color: Colors.white),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  FutureBuilder<User?>(
+                      future: _futureAgentConnected,
+                      builder: (context, snapshot) {
+                        return Column(
+                          children: [
+                            Text(
                                 snapshot.hasData
-                                    ? '${snapshot.data!.prenom} ${snapshot.data!.nom}'
+                                    ? '${snapshot.data!.lastname} ${snapshot.data!.firstname}'
                                     : '',
-                                style: GoogleFonts.sanchez(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.w500,
-                                  color: Defaults.libelleColor,
-                                ),
-                              ),
-                              Text(
-                                snapshot.hasData
-                                    ? '${snapshot.data!.matricule}'
-                                    : '',
-                                style: GoogleFonts.sanchez(
-                                    fontSize: 20,
+                                style: const TextStyle(
+                                    fontSize: 25,
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                              ),
-                            ],
-                          );
-                        })
-                  ],
-                ),
+                                    color: Colors.white)),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              snapshot.hasData ? '${snapshot.data!.id}' : '',
+                              style: GoogleFonts.sanchez(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        );
+                      })
+                ],
               )),
           Expanded(
             child: ListView(
@@ -89,7 +86,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 AppDrawerTile(
                   index: 1,
-                  route: '/listerecensement',
+                  route: '/listepayment',
                 ),
                 AppDrawerTile(
                   index: 2,
@@ -97,12 +94,12 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
                 AppDrawerTile(
                   index: 3,
-                  route: '',
+                  route: '/miseajour',
                 ),
               ],
             ),
           ),
-          Divider(
+          const Divider(
             height: 10,
             color: Defaults.bluePrincipal,
             indent: 20,
@@ -120,11 +117,11 @@ class _MyDrawerState extends State<MyDrawer> {
                 Navigator.push(
                     context, MaterialPageRoute(builder: (_) => LoginPage()));
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.power_settings_new_sharp,
                 size: 30.0,
               ),
-              label: Text(
+              label: const Text(
                 'Déconnexion',
                 style: TextStyle(
                   fontSize: 18,

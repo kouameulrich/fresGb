@@ -1,7 +1,7 @@
-import 'package:appfres/_api/apiService.dart';
+// ignore_for_file: prefer_const_constructors
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
-import 'package:appfres/models/encaissement.dart';
+import 'package:appfres/models/payment.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:appfres/widgets/error.dialog.dart';
 import 'package:appfres/widgets/loading.indicator.dart';
@@ -17,14 +17,14 @@ class TransfertDonnees extends StatefulWidget {
 }
 
 class _TransfertDonneesState extends State<TransfertDonnees> {
-  Future<List<Encaissement>>? _futureEncaissement;
+  Future<List<Payment>>? _futureEncaissement;
   final dbHandler = locator<LocalService>();
-  final apiService = locator<ApiService>();
+  // final apiService = locator<ApiService>();
   int _countEncaissement = 0;
-  List<Encaissement> _Encaissements = [];
+  List<Payment> _Payments = [];
 
-  Future<List<Encaissement>> getAllEncaissement() async {
-    return await dbHandler.readAllEncaissement();
+  Future<List<Payment>> getAllEncaissement() async {
+    return await dbHandler.readAllPayment();
   }
 
   @override
@@ -36,7 +36,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
       getAllEncaissement().then((value) => {
             setState(() {
               _countEncaissement = value.length;
-              _Encaissements = value;
+              _Payments = value;
             })
           });
     });
@@ -154,8 +154,8 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                         LoadingIndicatorDialog().show(context);
                         //await  apiService.sendEncaissement(_Encaissements);
                         //delete local data after transfering
-                        for (var Encaissement in _Encaissements) {
-                          dbHandler.deleteEncaissement(Encaissement.id);
+                        for (var Payment in _Payments) {
+                          dbHandler.deletePayment(Payment.id);
                         }
                         _futureEncaissement = getAllEncaissement();
                         setState(() {

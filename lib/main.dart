@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:appfres/di/service_locator.dart';
 import 'package:appfres/ui/pages/home.page.dart';
-import 'package:appfres/ui/pages/liste.encaissement.page.dart';
-import 'package:appfres/ui/pages/log.page.dart';
+import 'package:appfres/ui/pages/liste.payment.page.dart';
+import 'package:appfres/ui/pages/login.page.dart';
+import 'package:appfres/ui/pages/recherche.page.dart';
 import 'package:appfres/ui/pages/splash.screnn.page.dart';
 import 'package:appfres/ui/pages/transfert.page.dart';
 import 'package:appfres/widgets/navigator_key.dart';
@@ -30,18 +31,17 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
       routes: {
         '/': (context) => const SplashScreen(),
-        '/loginpage': (context) => LoginScreen(),
+        '/loginpage': (context) => LoginPage(),
         '/home': (context) => const HomePage(),
-        '/listerecensement': (context) => const ListeEncaissementPage(),
+        '/listepayment': (context) => const PaymentListPage(),
         '/transfert': (context) => const TransfertDonnees(),
+        '/miseajour': (context) => const RecherchePage(),
       },
       title: 'FresGB App',
       debugShowCheckedModeBanner: false,

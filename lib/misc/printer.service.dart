@@ -1,11 +1,11 @@
-import 'package:appfres/models/agent.dart';
-import 'package:appfres/models/encaissement.dart';
+import 'package:appfres/models/payment.dart';
+import 'package:appfres/models/user.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PrinterService {
-  printEncaissement(Agent agentConnected, Encaissement Encaissement) async {
+  printEncaissement(User agentConnected, Payment payment) async {
     final docPage = pw.Document();
     final logoImage = pw.MemoryImage(
         (await rootBundle.load('images/img.png')).buffer.asUint8List());
@@ -28,23 +28,22 @@ class PrinterService {
             pw.SizedBox(
               height: 10,
             ),
-            pw.Text(
-                'CLIENTE: ${Encaissement.nomClient} ${Encaissement.prenomClient}',
+            pw.Text('CLIENTE: ',
                 style: pw.TextStyle(
                     fontWeight: pw.FontWeight.normal, fontSize: 12)),
             pw.SizedBox(
               height: 10,
             ),
-            pw.Text('NUMERO CONTADOR: ${Encaissement.numeroCompteur}',
+            pw.Text('NUMERO CONTADOR: ',
                 style: pw.TextStyle(
                     fontWeight: pw.FontWeight.normal, fontSize: 12)),
             pw.SizedBox(
               height: 10,
             ),
-            pw.Text('${Encaissement.montantClient}',
+            pw.Text('',
                 style:
                     pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 25)),
-            pw.Text('NUMERO CLIENTE: : ${Encaissement.telephoneClient}',
+            pw.Text('NUMERO CLIENTE: : ',
                 style: pw.TextStyle(
                     fontWeight: pw.FontWeight.normal, fontSize: 12)),
             // pw.Text(
@@ -53,7 +52,7 @@ class PrinterService {
               height: 50,
             ),
             pw.Text(
-                'Opérateur : ${agentConnected.nom} ${agentConnected.prenom}'),
+                'Opérateur : ${agentConnected.firstname} ${agentConnected.lastname}'),
             pw.SizedBox(
               height: 40,
             ),

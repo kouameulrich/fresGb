@@ -3,9 +3,7 @@ import 'package:path/path.dart';
 
 class DatabaseConnection {
   Future<Database> setDatabase() async {
-    //var directory = await getApplicationDocumentsDirectory();
-    //var path = join(directory.path, 'db_crud');
-    var path = join(await getDatabasesPath(), 'db_crud');
+    var path = join(await getDatabasesPath(), 'fresApp_db');
     await deleteDatabase(path);
     var database =
         await openDatabase(path, version: 1, onCreate: _createDatabase);
@@ -13,16 +11,21 @@ class DatabaseConnection {
   }
 
   Future<void> _createDatabase(Database database, int version) async {
-    String sqlRecensement =
-        "CREATE TABLE encaissement (id INTEGER PRIMARY KEY, nomClient TEXT, prenomClient TEXT, numeroCompteur TEXT, montantClient REAL, sexeClient TEXT, telephoneClient TEXT, dateEncaissement TEXT, matriculeAgent TEXT);";
-    await database.execute(sqlRecensement);
+    String sqlPayment =
+        "CREATE TABLE payment (id TEXT PRIMARY KEY, agent TEXT, contract TEXT, amount REAL, paymentDate TEXT);";
+    await database.execute(sqlPayment);
 
-    // String sqlLogin =
-    //     "CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT, password TEXT);";
-    // await database.execute(sqlLogin);
+    String sqlContract =
+        '''CREATE TABLE contract(id TEXT, reference TEXT PRIMARY KEY, offer TEXT, type TEXT, client_id INTEGER NOT NULL, FOREIGN KEY (client_id) REFERENCES client (reference)                  
+       ON DELETE NO ACTION ON UPDATE NO ACTION)''';
+    await database.execute(sqlContract);
 
-    String sqlContrat =
-        "CREATE TABLE contrat(id INTEGER PRIMARY KEY, reference TEXT, type TEXT, startDate TEXT, endDate TEXT, offer TEXT, status TEXT, clientId TEXT);";
-    await database.execute(sqlContrat);
+    String sqlClient =
+        "CREATE TABLE client(id TEXT, reference INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, village TEXT, phoneNumber TEXT);";
+    await database.execute(sqlClient);
+
+    String sqlUser =
+        "CREATE TABLE user(id TEXT PRIMARY KEY, email TEXT, phoneNumber TEXT, password TEXT, firstName TEXT, lastName TEXT);";
+    await database.execute(sqlUser);
   }
 }

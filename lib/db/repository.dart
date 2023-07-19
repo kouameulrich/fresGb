@@ -41,4 +41,9 @@ class Repository {
     var connection = await database;
     return await connection?.rawDelete("delete from $table where id=$itemId");
   }
+
+  rawSelect(rawSql) async {
+    var connection = await database;
+    return await connection?.rawQuery(rawSql);
+  }
 }

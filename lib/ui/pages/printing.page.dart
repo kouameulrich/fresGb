@@ -1,6 +1,6 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:appfres/ui/pages/liste.encaissement.page.dart';
+import 'package:appfres/ui/pages/liste.payment.page.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -19,7 +19,7 @@ class PrintingPage extends StatelessWidget {
           onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ListeEncaissementPage(),
+                builder: (context) => PaymentListPage(),
               )),
         ),
         centerTitle: true,

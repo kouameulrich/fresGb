@@ -2,7 +2,7 @@ class Endpoints {
   Endpoints._();
 
   // base url
-  static const String baseUrl = "https://web.simbo.me/api/simboweb";
+  static const String baseUrl = "http://192.168.1.10:8080";
 
   // receiveTimeout
   static const int receiveTimeout = 15000;
@@ -10,12 +10,11 @@ class Endpoints {
   // connectTimeout
   static const int connectionTimeout = 15000;
 
-  static const String typeEquipements = '/typeequipements/simple/list';
+  static const String contracts = '/api/public/allContracts';
 
-  static const String secteurs = '/secteurs/simple/list';
+  static const String clients = '/api/public/allClient';
 
-  static const String activiteCommerciales =
-      '/activitecommerciales/simple/list';
+  static const String payments = '/api/public/allPayments';
 
-  static const String encaissements = '/recensements/simple/list';
+  static const String users = '/api/public/allUsers';
 }

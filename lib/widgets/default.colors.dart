@@ -13,6 +13,8 @@ class Defaults {
   static const Color greenPrincipal = Color(0xFF14c9a6);
   static const Color greenSelected = Color(0xFF59f1d3);
   static const Color blueFondCadre = Color(0xFFe8f6f9);
+  static const Color blueAppBar = Color.fromRGBO(15, 81, 105, 1);
+  static const Color white = Color.fromARGB(255, 255, 255, 255);
 
   static final drawerItemText = [
     'Acceuil',
