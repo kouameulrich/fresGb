@@ -19,7 +19,7 @@ class PrintingPage extends StatelessWidget {
           onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PaymentListPage(),
+                builder: (context) => const PaymentListPage(),
               )),
         ),
         centerTitle: true,

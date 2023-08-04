@@ -1,24 +1,21 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:math';
-
 import 'package:appfres/_api/apiService.dart';
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
-import 'package:appfres/models/dto/contract.dart';
 import 'package:appfres/models/dto/customer.dart';
-import 'package:appfres/models/payment.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/home.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:appfres/widgets/loading.indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../_api/authService.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -64,13 +61,13 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.only(top: 40, bottom: 30),
                 child: Center(
                   child: Container(
-                    child: Image.asset(
-                      'images/img.png',
-                    ),
                     width: 200,
                     height: 200,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50.0)),
+                    child: Image.asset(
+                      'images/img.png',
+                    ),
                   ),
                 ),
               ),
@@ -184,24 +181,6 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
 
-        //load user
-        // List<User> users = await apiService.getAllUsers();
-        // for (var user in users) {
-        //   dbHandler.SaveUser(user);
-        // }
-
-        // //load contract
-        // List<Contract> contracts = await apiService.getAllContracts();
-        // for (var contract in contracts) {
-        //   dbHandler.SaveContract(contract);
-        // }
-
-        // //load payment
-        // List<Payment> payments = await apiService.getAllPayments();
-        // for (var payment in payments) {
-        //   dbHandler.SavePayment(payment);
-        // }
-
         LoadingIndicatorDialog().dismiss();
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => const HomePage()));
@@ -216,12 +195,19 @@ class _LoginPageState extends State<LoginPage> {
                   'ERROR',
                   textAlign: TextAlign.center,
                 ),
-                content: const SizedBox(
+                content: SizedBox(
                   height: 120,
                   child: Column(
                     children: [
-                      Text(
-                        'Nom d\'utilisateur ou mot de passe incorrect',
+                      Lottie.asset(
+                        'animations/auth.json',
+                        repeat: true,
+                        reverse: true,
+                        fit: BoxFit.cover,
+                        height: 100,
+                      ),
+                      const Text(
+                        'Incorrect username and or password',
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -232,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Réessayer'))
+                      child: const Text('Retry'))
                 ],
               );
             });

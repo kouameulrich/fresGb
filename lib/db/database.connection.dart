@@ -16,8 +16,7 @@ class DatabaseConnection {
     await database.execute(sqlPayment);
 
     String sqlContract =
-        '''CREATE TABLE contract(id TEXT, reference TEXT PRIMARY KEY, offer TEXT, type TEXT, client_id INTEGER NOT NULL, FOREIGN KEY (client_id) REFERENCES client (reference)                  
-       ON DELETE NO ACTION ON UPDATE NO ACTION)''';
+        "CREATE TABLE contract(reference TEXT PRIMARY KEY, offer TEXT, clientName TEXT,)";
     await database.execute(sqlContract);
 
     String sqlClient =

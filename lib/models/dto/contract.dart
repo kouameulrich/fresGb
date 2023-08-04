@@ -1,12 +1,10 @@
 class Contract {
-  String? id;
   late String reference;
   late String offer;
   String? type;
   String? client_id;
 
   Contract({
-    required this.id,
     required this.reference,
     required this.offer,
     required this.type,
@@ -14,15 +12,18 @@ class Contract {
   });
 
   Contract.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
     reference = json['reference'];
     offer = json['offer'];
     type = json['type'];
   }
 
+  @override
+  String toString() {
+    return 'Contract{reference: $reference, offer: $offer, type: $type, client_id: $client_id}';
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
     data['reference'] = reference;
     data['offer'] = offer;
     data['type'] = type;

@@ -52,6 +52,7 @@ class LocalService {
     return await _repository.insertData('client', customer.toJson());
   }
 
+//Read All Client
   Future<List<Customer>> readAllClient() async {
     List<Customer> clients = [];
     List<Map<String, dynamic>> list = await _repository.readData('client');
@@ -61,6 +62,7 @@ class LocalService {
     return clients;
   }
 
+//Read All Contract per Client
   Future<List<Contract>> getContractsPerClient(clientId) async {
     var sql = "SELECT * FROM contract WHERE client_id = $clientId";
     List<Contract> contracts = [];

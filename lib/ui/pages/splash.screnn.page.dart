@@ -18,7 +18,7 @@ class _SplashScreen extends State<SplashScreen> {
   Widget build(BuildContext context) {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginPage()));
+          context, MaterialPageRoute(builder: (context) => const LoginPage()));
     });
     return Scaffold(
       backgroundColor: Defaults.backgroundColorPage,

@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
@@ -6,18 +6,23 @@ import 'package:appfres/di/service_locator.dart';
 import 'package:appfres/misc/printer.service.dart';
 import 'package:appfres/models/dto/contract.dart';
 import 'package:appfres/models/dto/customer.dart';
+import 'package:appfres/models/payment.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/liste.payment.page.dart';
+import 'package:appfres/ui/pages/login.page.dart';
+import 'package:appfres/ui/pages/printing.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import 'package:uuid/uuid.dart';
+import 'package:pdf/widgets.dart' as pw;
 
-/// AFFICHAGE DU FORMULAIRE DE PAIEMENT
 class PaymentPage extends StatefulWidget {
-  PaymentPage({super.key, required this.customer});
+  const PaymentPage({super.key, required this.customer});
 
   final Customer customer;
+  //final Payment payment;
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
@@ -28,15 +33,17 @@ class _PaymentPageState extends State<PaymentPage> {
   final _formKey = GlobalKey<FormState>();
   final dbHandler = locator<LocalService>();
   final storage = locator<TokenStorageService>();
-  late final Future<User?> _futureAgentConnected;
   User? agentConnected;
   var clientId = "";
 
-  String? _selectedContractOffer;
-  String? _selectedContractType;
-
   String? _selectContract;
   List<Contract> contract = [];
+
+  bool isUserLoggedIn() {
+    return agentConnected != null;
+  }
+
+  Payment? payment;
 
   TextEditingController montantverseController = TextEditingController();
 
@@ -52,11 +59,14 @@ class _PaymentPageState extends State<PaymentPage> {
     return await dbHandler.getContractsPerClient(widget.customer.reference);
   }
 
+  Future<List<Payment>> getAllPayment() async {
+    return await dbHandler.readAllPayment();
+  }
+
   @override
   void initState() {
-    _futureAgentConnected = getAgent();
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       print('------- DATA -------');
 
       getAllClient().then((value) => setState(() {}));
@@ -191,11 +201,6 @@ class _PaymentPageState extends State<PaymentPage> {
                         SizedBox(
                           height: 5,
                         ),
-                        Text('Offer: '),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('Type: '),
                       ],
                     ),
                     Padding(
@@ -206,11 +211,6 @@ class _PaymentPageState extends State<PaymentPage> {
                         child: TextFormField(
                           controller: montantverseController,
                           keyboardType: TextInputType.number,
-                          // validator: (value) {
-                          //   if (value == null || value.isEmpty) {
-                          //     return 'Entrer un montant';
-                          //   } else if (double.parse(value)> double.parse(source))
-                          // },
                           decoration: InputDecoration(hintText: 'Montant payé'),
                         ),
                       ),
@@ -219,7 +219,9 @@ class _PaymentPageState extends State<PaymentPage> {
                       padding: const EdgeInsets.only(
                           bottom: 15, left: 0, right: 0, top: 15),
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          onSubmit();
+                        },
                         style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                                 Defaults.bluePrincipal)),
@@ -247,5 +249,130 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
     );
+  }
+
+  onSubmit() async {
+    if (!isUserLoggedIn()) {
+      // L'utilisateur n'est pas connecté, redirigez-le vers la page de connexion.
+      // Vous pouvez utiliser la méthode Navigator.pushReplacement pour le rediriger.
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                'ALERTE',
+                textAlign: TextAlign.center,
+              ),
+              content: SizedBox(
+                height: 120,
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'animations/verif.json',
+                      repeat: true,
+                      reverse: true,
+                      fit: BoxFit.cover,
+                      height: 100,
+                    ),
+                    const Text(
+                      'Veillez-vous connecter  . . .',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  },
+                  child: const Text('Retry'),
+                )
+              ],
+            );
+          });
+      return;
+    }
+    if (_formKey.currentState!.validate()) {
+      DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(
+              'CONFIRMATION',
+              textAlign: TextAlign.center,
+            ),
+            content: SizedBox(
+              height: 120,
+              child: Column(
+                children: [
+                  Lottie.asset(
+                    'animations/verif.json',
+                    repeat: true,
+                    reverse: true,
+                    fit: BoxFit.cover,
+                    height: 100,
+                  ),
+                  const Text(
+                    'Voulez-vous payer cette facture ?',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Non'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (_selectContract == null) {
+                    // Handle the case when no contract is selected.
+                    return;
+                  }
+
+                  if (agentConnected == null) {
+                    // Handle the case when the agentConnected is null.
+                    return;
+                  }
+
+                  String paymentId = Uuid()
+                      .v4(); // Générer un identifiant unique pour le paiement
+
+                  payment = Payment(
+                    // Populate the payment object.
+                    id: paymentId,
+                    agent: agentConnected!.id,
+                    contract: _selectContract!,
+                    amount: double.parse(montantverseController.text),
+                    paymentDate: dateFormat.format(DateTime.now()),
+                  );
+
+                  await dbHandler.SavePayment(payment!);
+                  pw.Document docPage1 = await printerService.printEncaissement(
+                      agentConnected!, widget.customer);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PrintingPage(
+                        docPage: docPage1,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Oui'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }

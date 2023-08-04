@@ -1,9 +1,12 @@
 // ignore_for_file: file_names
 
+import 'dart:convert';
+
 import 'package:appfres/_api/dioClient.dart';
 import 'package:appfres/_api/endpoints.dart';
 import 'package:appfres/models/dto/contract.dart';
 import 'package:appfres/models/dto/customer.dart';
+import 'package:appfres/models/dto/payment.dto.dart';
 import 'package:appfres/models/payment.dart';
 import 'package:appfres/models/user.dart';
 
@@ -12,7 +15,7 @@ class ApiService {
   ApiService(this._dioClient);
 
   Future<User> getUserConnected(String trim) async {
-    String agentEndpoint = 'http://192.168.1.11:8080/api/auth/signin';
+    String agentEndpoint = 'http://192.168.1.8:8080/api/auth/signin';
     final response = await _dioClient.post(agentEndpoint);
     return User.fromJson(response.data);
   }
@@ -47,5 +50,30 @@ class ApiService {
     List<Payment> payments =
         (response.data as List).map((e) => Payment.fromJson(e)).toList();
     return payments;
+  }
+
+  Future<void> sendPayment(List<Payment> payments, String agent) async {
+    final paymentJson = convertPaymentToJsonDto(payments, agent)
+        .map((e) => e.toJson())
+        .toList();
+    print(json.encode(paymentJson));
+    await _dioClient.post(Endpoints.paiementFacture,
+        data: json.encode(paymentJson));
+  }
+
+  List<Paymentdto> convertPaymentToJsonDto(
+      List<Payment> payments, String matriculeagent) {
+    List<Paymentdto> paymentdtos = [];
+    for (var p in payments) {
+      Paymentdto p1 = Paymentdto(
+        id: p.id,
+        agent: p.agent,
+        contract: p.contract,
+        amount: p.amount,
+        paymentDate: p.paymentDate,
+      );
+      paymentdtos.add(p1);
+    }
+    return paymentdtos;
   }
 }

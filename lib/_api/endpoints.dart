@@ -2,7 +2,7 @@ class Endpoints {
   Endpoints._();
 
   // base url
-  static const String baseUrl = "http://192.168.1.10:8080";
+  static const String baseUrl = "http://192.168.1.8:8080";
 
   // receiveTimeout
   static const int receiveTimeout = 15000;
@@ -17,4 +17,6 @@ class Endpoints {
   static const String payments = '/api/public/allPayments';
 
   static const String users = '/api/public/allUsers';
+
+  static const String paiementFacture = '/api/public/bulkPayments';
 }

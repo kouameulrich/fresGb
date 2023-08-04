@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   final storage = locator<TokenStorageService>();
   late final Future<User?> _futureAgentConnected;
   late TabController _tabController;
-  int _countEquipementRecense = 0;
+  final int _countEquipementRecense = 0;
 
   List<Payment> _Payment = [];
   int maleNumber = 0;
@@ -54,8 +54,8 @@ class _HomePageState extends State<HomePage> {
       final text = hasInternet ? 'Connexion internet active' : 'Pas Internet';
       showSimpleNotification(
         Text(
-          '$text',
-          style: TextStyle(color: Colors.white, fontSize: 20),
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 20),
         ),
         background: color,
       );
@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         backgroundColor: Defaults.blueFondCadre,
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(15, 81, 105, 1),
+          backgroundColor: const Color.fromRGBO(15, 81, 105, 1),
           title: const Text('Accueil'),
           bottom: const TabBar(
             indicatorColor: Defaults.greenSelected,
@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        drawer: MyDrawer(),
+        drawer: const MyDrawer(),
         body: TabBarView(
           children: [
             GridView.count(
@@ -232,120 +232,120 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                ListView(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              offset: Offset(
-                                5.0,
-                                5.0,
-                              ), //Offset
-                              blurRadius: 5.0,
-                              spreadRadius: 2.0,
-                            ), //BoxShadow
-                            BoxShadow(
-                              color: Colors.white,
-                              offset: Offset(0.0, 0.0),
-                              blurRadius: 0.0,
-                              spreadRadius: 0.0,
-                            ), //BoxShadow
-                          ],
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '$femaleNumber',
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    color: Defaults.bluePrincipal,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const Text(
-                                'Client',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Defaults.bluePrincipal),
-                              ),
-                              const Text(
-                                'Particulier',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Defaults.bluePrincipal),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                ListView(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              offset: Offset(
-                                5.0,
-                                5.0,
-                              ), //Offset
-                              blurRadius: 5.0,
-                              spreadRadius: 2.0,
-                            ), //BoxShadow
-                            BoxShadow(
-                              color: Colors.white,
-                              offset: Offset(0.0, 0.0),
-                              blurRadius: 0.0,
-                              spreadRadius: 0.0,
-                            ), //BoxShadow
-                          ],
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '$maleNumber',
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    color: Defaults.bluePrincipal,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const Text(
-                                'Client',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Defaults.bluePrincipal),
-                              ),
-                              const Text(
-                                'Entreprise',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Defaults.bluePrincipal),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                //   ListView(
+                //     children: [
+                //       Padding(
+                //         padding: const EdgeInsets.all(8.0),
+                //         child: Container(
+                //           height: 150,
+                //           decoration: BoxDecoration(
+                //             color: Colors.white,
+                //             borderRadius: BorderRadius.circular(8),
+                //             boxShadow: const [
+                //               BoxShadow(
+                //                 color: Colors.black12,
+                //                 offset: Offset(
+                //                   5.0,
+                //                   5.0,
+                //                 ), //Offset
+                //                 blurRadius: 5.0,
+                //                 spreadRadius: 2.0,
+                //               ), //BoxShadow
+                //               BoxShadow(
+                //                 color: Colors.white,
+                //                 offset: Offset(0.0, 0.0),
+                //                 blurRadius: 0.0,
+                //                 spreadRadius: 0.0,
+                //               ), //BoxShadow
+                //             ],
+                //           ),
+                //           child: Center(
+                //             child: Column(
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: [
+                //                 Text(
+                //                   '$femaleNumber',
+                //                   style: const TextStyle(
+                //                       fontSize: 24,
+                //                       color: Defaults.bluePrincipal,
+                //                       fontWeight: FontWeight.bold),
+                //                 ),
+                //                 const Text(
+                //                   'Client',
+                //                   style: TextStyle(
+                //                       fontSize: 15,
+                //                       color: Defaults.bluePrincipal),
+                //                 ),
+                //                 const Text(
+                //                   'Particulier',
+                //                   style: TextStyle(
+                //                       fontSize: 15,
+                //                       color: Defaults.bluePrincipal),
+                //                 ),
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                //   ListView(
+                //     children: [
+                //       Padding(
+                //         padding: const EdgeInsets.all(8.0),
+                //         child: Container(
+                //           height: 150,
+                //           decoration: BoxDecoration(
+                //             color: Colors.white,
+                //             borderRadius: BorderRadius.circular(8),
+                //             boxShadow: const [
+                //               BoxShadow(
+                //                 color: Colors.black12,
+                //                 offset: Offset(
+                //                   5.0,
+                //                   5.0,
+                //                 ), //Offset
+                //                 blurRadius: 5.0,
+                //                 spreadRadius: 2.0,
+                //               ), //BoxShadow
+                //               BoxShadow(
+                //                 color: Colors.white,
+                //                 offset: Offset(0.0, 0.0),
+                //                 blurRadius: 0.0,
+                //                 spreadRadius: 0.0,
+                //               ), //BoxShadow
+                //             ],
+                //           ),
+                //           child: Center(
+                //             child: Column(
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: [
+                //                 Text(
+                //                   '$maleNumber',
+                //                   style: const TextStyle(
+                //                       fontSize: 24,
+                //                       color: Defaults.bluePrincipal,
+                //                       fontWeight: FontWeight.bold),
+                //                 ),
+                //                 const Text(
+                //                   'Client',
+                //                   style: TextStyle(
+                //                       fontSize: 15,
+                //                       color: Defaults.bluePrincipal),
+                //                 ),
+                //                 const Text(
+                //                   'Entreprise',
+                //                   style: TextStyle(
+                //                       fontSize: 15,
+                //                       color: Defaults.bluePrincipal),
+                //                 ),
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
               ],
             ),
           ],

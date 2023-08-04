@@ -18,6 +18,11 @@ class Customer {
       required this.phoneNumber,
       required this.contracts});
 
+  @override
+  String toString() {
+    return 'Customer{id: $id, reference: $reference, firstName: $firstName, lastName: $lastName, village: $village, phoneNumber: $phoneNumber, contracts: $contracts}';
+  }
+
   factory Customer.fromJson(Map<String, dynamic> json) {
     var matObjsJson = ((json['contracts'] ?? []) as List);
     List<Contract> matJson =

@@ -36,7 +36,7 @@ class _MyDrawerState extends State<MyDrawer> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeader(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Defaults.bottomColor,
               ),
               padding:
@@ -65,7 +65,7 @@ class _MyDrawerState extends State<MyDrawer> {
                               height: 10,
                             ),
                             Text(
-                              snapshot.hasData ? '${snapshot.data!.id}' : '',
+                              snapshot.hasData ? '${snapshot.data!.email}' : '',
                               style: GoogleFonts.sanchez(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
@@ -114,8 +114,8 @@ class _MyDrawerState extends State<MyDrawer> {
                 storage.deleteAllToken();
                 indexClicked = 0;
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => LoginPage()));
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()));
               },
               icon: const Icon(
                 Icons.power_settings_new_sharp,
@@ -152,7 +152,7 @@ class AppDrawerDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Divider(
+    return const Divider(
       height: 1,
       thickness: 1,
       color: Defaults.textColor,

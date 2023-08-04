@@ -1,14 +1,17 @@
-import 'package:appfres/models/payment.dart';
+// Importations
+import 'package:appfres/models/dto/customer.dart';
 import 'package:appfres/models/user.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PrinterService {
-  printEncaissement(User agentConnected, Payment payment) async {
+  Future<pw.Document> printEncaissement(
+      User agentConnected, Customer customer) async {
     final docPage = pw.Document();
-    final logoImage = pw.MemoryImage(
-        (await rootBundle.load('images/img.png')).buffer.asUint8List());
+    final Uint8List imageData =
+        (await rootBundle.load('images/img.png')).buffer.asUint8List();
+    final logoImage = pw.MemoryImage(imageData);
     docPage.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a6,
@@ -28,26 +31,27 @@ class PrinterService {
             pw.SizedBox(
               height: 10,
             ),
-            pw.Text('CLIENTE: ',
+            pw.Text('CLIENTE: ${customer.firstName} ${customer.lastName}',
                 style: pw.TextStyle(
                     fontWeight: pw.FontWeight.normal, fontSize: 12)),
             pw.SizedBox(
               height: 10,
             ),
-            pw.Text('NUMERO CONTADOR: ',
+            pw.Text('NUMERO CONTADOR: ${customer.reference}',
                 style: pw.TextStyle(
                     fontWeight: pw.FontWeight.normal, fontSize: 12)),
             pw.SizedBox(
               height: 10,
             ),
-            pw.Text('',
+            pw.Text('MONTANT',
                 style:
                     pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 25)),
-            pw.Text('NUMERO CLIENTE: : ',
+            // pw.Text('${payment.amount}',
+            //     style:
+            //         pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 25)),
+            pw.Text('NUMERO CLIENTE: : ${customer.phoneNumber}',
                 style: pw.TextStyle(
                     fontWeight: pw.FontWeight.normal, fontSize: 12)),
-            // pw.Text(
-            //     'Opérateur : ${agentConnected!.nom} ${agentConnected!.prenom}'),
             pw.SizedBox(
               height: 50,
             ),

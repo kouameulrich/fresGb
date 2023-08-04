@@ -58,7 +58,7 @@ class AuthService {
 
   Future<int?> authenticateUser(
       String usernameController, String passwordController) async {
-    String url = 'http://192.168.1.10:8080/api/auth/signin';
+    String url = 'http://192.168.1.8:8080/api/auth/signin';
     var response = await http.post(Uri.parse(url),
         headers: {"Content-type": "application/json"},
         body: jsonEncode({
@@ -78,4 +78,31 @@ class AuthService {
       return response.statusCode;
     }
   }
+
+  // Future<int?> sendData() async {
+  //   var headersList = {'Accept': '*/*', 'Content-Type': 'application/json'};
+  //   var url = Uri.parse('http://192.168.1.8:8080/api/public/bulkPayments');
+
+  //   var body = [
+  //     {
+  //       "agent": {"id": "64a4a22663cdbd123d85937f"},
+  //       "contract": {"reference": "C380014"},
+  //       "amount": "35000.00",
+  //       "paymentDate": "2023-07-29T12:02:01.411+00:00"
+  //     }
+  //   ];
+
+  //   var req = http.Request('POST', url);
+  //   req.headers.addAll(headersList);
+  //   req.body = json.encode(body);
+
+  //   var res = await req.send();
+  //   final resBody = await res.stream.bytesToString();
+
+  //   if (res.statusCode >= 200 && res.statusCode < 300) {
+  //     print(resBody);
+  //   } else {
+  //     print(res.reasonPhrase);
+  //   }
+  // }
 }

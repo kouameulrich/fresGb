@@ -13,12 +13,17 @@ class Payment {
     required this.paymentDate,
   });
 
+  @override
+  String toString() {
+    return 'Payment{id: $id, agent: $agent, amount: $amount, contract: $contract, paymentDate: $paymentDate}';
+  }
+
   Payment.fromJson(Map<String, dynamic> json) {
-    id = json['id'].toString();
-    agent = json['agent'].toString();
-    contract = json['contract'].toString();
-    amount = double.tryParse(json['amount'].toString());
-    paymentDate = json['paymentDate'].toString();
+    id = json['id'];
+    agent = json['agent'];
+    contract = json['contract'];
+    amount = json['amount'];
+    paymentDate = json['paymentDate'];
   }
 
   Map<String, dynamic> toJson() {

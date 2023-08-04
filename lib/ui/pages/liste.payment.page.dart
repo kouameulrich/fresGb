@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, unused_field, unnecessary_string_interpolations
 
+import 'package:appfres/_api/apiService.dart';
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
 import 'package:appfres/misc/printer.service.dart';
+import 'package:appfres/models/dto/contract.dart';
 import 'package:appfres/models/dto/customer.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/payment.page.dart';
@@ -20,7 +22,7 @@ class PaymentListPage extends StatefulWidget {
 
 class _PaymentListPageState extends State<PaymentListPage> {
   final printerService = locator<PrinterService>();
-  final _formKey = GlobalKey<FormState>();
+  final apiService = locator<ApiService>();
   final dbHandler = locator<LocalService>();
   final storage = locator<TokenStorageService>();
   late final Future<User?> _futureAgentConnected;
@@ -30,7 +32,10 @@ class _PaymentListPageState extends State<PaymentListPage> {
   Customer? customer;
   List<Customer> _customers = [];
   int _countCustomer = 0;
-  int _countCustomerPay = 0;
+  final int _countCustomerPay = 0;
+
+  String? _selectContract;
+  List<Contract> contract = [];
 
   TextEditingController searchController = TextEditingController();
 
@@ -40,6 +45,10 @@ class _PaymentListPageState extends State<PaymentListPage> {
 
   Future<List<Customer>> getAllClient() async {
     return await dbHandler.readAllClient();
+  }
+
+  Future<List<Contract>> getAllContract() async {
+    return await dbHandler.getContractsPerClient(_customers);
   }
 
   String _searchText = ''; // Variable pour stocker le texte de recherche
@@ -69,7 +78,7 @@ class _PaymentListPageState extends State<PaymentListPage> {
   void initState() {
     _futureAgentConnected = getAgent();
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       print('------- DATA -------');
 
       getAllClient().then((value) => setState(() {
@@ -194,13 +203,6 @@ class _PaymentListPageState extends State<PaymentListPage> {
                                     color: Defaults.bluePrincipal,
                                   ),
                                 ),
-                                Text(
-                                  '${customer.contracts}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Defaults.bluePrincipal,
-                                  ),
-                                ),
                               ],
                             ),
                             // trailing: contract.offer == contract.offer
@@ -219,7 +221,7 @@ class _PaymentListPageState extends State<PaymentListPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => PaymentPage(
-                                            customer: _customers![index],
+                                            customer: _customers[index],
                                           )));
                             },
                           ),
