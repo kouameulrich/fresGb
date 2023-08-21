@@ -9,6 +9,7 @@ import 'package:appfres/models/payment.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/home.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
+import 'package:appfres/widgets/loading.indicator.dart';
 import 'package:appfres/widgets/mydrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +35,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
   double _montantCollecte = 0.0;
 
   String userid = '';
+  String token = '';
 
   Future<List<Payment>>? _futureEncaissement;
 
@@ -51,13 +53,18 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // do something
-      getAgent().then((value) => userid = value!.id!);
+      getAgent().then((value) {
+        userid = value!.id!;
+        token = value.token!;
+      });
       getAllEncaissement().then((value) => {
             setState(() {
               _payments = value;
               _countEncaissement = value.length;
               _montantCollecte = _payments.toList().fold(
                   0, (value, element) => value.toDouble() + element.amount!);
+              // Afficher tous les paiements dans le log
+              for (var payment in _payments) {}
             })
           });
     });
@@ -68,7 +75,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Defaults.appBarColor,
-        title: const Text('Transfert'),
+        title: const Text('Transferir'),
         centerTitle: true,
       ),
       drawer: MyDrawer(),
@@ -93,8 +100,9 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                       child: Column(
                         children: [
                           const Text(
-                            "Encaissements",
-                            style: TextStyle(fontSize: 20),
+                            "Coleção",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
                             height: 20,
@@ -107,7 +115,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                             child: Column(
                               children: [
                                 Text(
-                                  'Nombre: $_countEncaissement',
+                                  'Numero: $_countEncaissement',
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -133,7 +141,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                                       color: Defaults.greenSelected),
                                 ),
                                 Text(
-                                  'Montant Collecté',
+                                  'Montante Coletado',
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: Defaults.bluePrincipal),
@@ -158,7 +166,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                                   children: const [
                                     Icon(Icons.send),
                                     Text(
-                                      'Transferer',
+                                      'Transferir',
                                       style: TextStyle(fontSize: 20),
                                     )
                                   ],
@@ -180,14 +188,14 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
   }
 
   void sendData() async {
+    LoadingIndicatorDialog().show(context);
+
     var headersList = {
-      'Accept': '*/*',
       'Content-Type': 'application/json',
-      'Authorization':
-          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFua0BnbWFpbC5jb20iLCJpYXQiOjE2OTA5ODYyODAsImV4cCI6MTY5MTA3MjY4MH0.6A-hjkVzBrxqQRDbUo43R9Tp1Yr4nIf6aV9PJVjqSUw2TLfTOfczMg6CAIhSzoDsOFQM2afYkQ5FWJQZ1B3-gA'
+      'Authorization': 'Bearer $token'
     };
-    var url =
-        Uri.parse('http://192.168.1.8:8080/api/public/bulkPayments/$userid');
+    var url = Uri.parse(
+        'https://www.digitale-it.com/fres/api/payment/bulkPayments/$userid');
 
     // Assurez-vous que _payments n'est pas vide avant de continuer
     if (_payments.isNotEmpty) {
@@ -197,9 +205,10 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
       for (var payment in _payments) {
         body.add({
           "agent": {"id": payment.agent},
-          "contract": {"reference": payment.contract},
+          "contract": {"id": payment.contract},
           "amount": payment.amount,
-          "paymentDate": payment.paymentDate.toString()
+          "paymentDate": payment.paymentDate.toString(),
+          "status": payment.status,
         });
       }
 
@@ -209,13 +218,20 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
 
       var res = await req.send();
 
+      LoadingIndicatorDialog().dismiss();
+
       ///-------- POPU UP OF SUCCESS ---------//
       if (res.statusCode >= 200 && res.statusCode < 300) {
+        // Supprimer les données après l'envoi réussi
+        for (var payment in _payments) {
+          await dbHandler.deletePayment(
+              "'${payment.id}'"); // En entourant l'identifiant avec des guillemets simples
+        }
         return showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text(
-              'SUCCESS',
+              'SUCESSO',
               textAlign: TextAlign.center,
             ),
             content: SizedBox(
@@ -230,7 +246,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                     height: 100,
                   ),
                   const Text(
-                    'Payment send Successfuly',
+                    'Pagamento enviado com sucesso',
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -242,7 +258,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => const HomePage()));
                   },
-                  child: const Text('GO BACK'))
+                  child: const Text('VOLTAR'))
             ],
           ),
         );
@@ -252,7 +268,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
             context: context,
             builder: (context) => AlertDialog(
               title: const Text(
-                'ERROR',
+                'ERRO',
                 textAlign: TextAlign.center,
               ),
               content: SizedBox(
@@ -267,7 +283,7 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                       height: 100,
                     ),
                     const Text(
-                      'Error in Payment Data',
+                      'Erro occoreu durante a transaçao',
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -278,14 +294,12 @@ class _TransfertDonneesState extends State<TransfertDonnees> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Retry'))
+                    child: const Text('Tenta de novo'))
               ],
             ),
           );
         });
       }
-    } else {
-      print("La liste _payments est vide.");
-    }
+    } else {}
   }
 }

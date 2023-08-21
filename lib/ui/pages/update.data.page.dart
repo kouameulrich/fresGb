@@ -2,7 +2,7 @@
 import 'package:appfres/_api/apiService.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
-import 'package:appfres/models/dto/customer.dart';
+import 'package:appfres/models/dto/contract.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/home.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
@@ -22,20 +22,12 @@ class _UpdateDataPageState extends State<UpdateDataPage> {
   final dbHandler = locator<LocalService>();
   User? agentConnected;
   final apiService = locator<ApiService>();
+  Contract? contract;
+  List<Contract> _contracts = [];
 
   @override
   void initState() {
-    // _futureEncaissement = getAllEncaissement();
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   // do something
-    //   getAllEncaissement().then((value) => {
-    //         setState(() {
-    //           _countEncaissement = value.length;
-    //           _Payments = value;
-    //         })
-    //       });
-    // });
   }
 
   @override
@@ -43,7 +35,7 @@ class _UpdateDataPageState extends State<UpdateDataPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Defaults.appBarColor,
-        title: const Text('Mise à jour de donnée'),
+        title: const Text('Atualisaçao de data'),
         centerTitle: true,
       ),
       drawer: MyDrawer(),
@@ -61,59 +53,66 @@ class _UpdateDataPageState extends State<UpdateDataPage> {
                   color: Colors.white,
                   elevation: 70,
                   child: SizedBox(
-                    width: 300,
-                    height: 250,
+                    width: 310,
+                    height: 310,
                     child: Padding(
                       padding: EdgeInsets.all(20),
                       child: Column(
                         children: [
                           const Text(
-                            "Mise à jour des données",
-                            style: TextStyle(fontSize: 20),
+                            "Atualisaçao de data",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              // color: Defaults.appBarColor,
-                            ),
-                            // child: FutureBuilder(
-                            //     future: _futureEncaissement,
-                            //     builder: (context, snapshot) {
-                            //       return Text(
-                            //           snapshot.hasData
-                            //               ? snapshot.data!.length.toString()
-                            //               : '0',
-                            //           style: const TextStyle(fontSize: 75));
-                            //     }),
-                          ),
-                          const SizedBox(
-                            height: 13,
+                            height: 5,
                           ),
                           SizedBox(
-                              width: 250,
-                              child: ElevatedButton(
-                                  onPressed: () => _submitLogin(),
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all(
-                                              Defaults.bottomColor)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.send),
-                                        Text(
-                                          'Dowloand',
-                                          style: TextStyle(fontSize: 20),
-                                        )
-                                      ],
+                            height: 160,
+                            child: Column(
+                              children: [
+                                Lottie.asset(
+                                  'animations/sendData.json',
+                                  repeat: true,
+                                  reverse: true,
+                                  fit: BoxFit.cover,
+                                  height: 150,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          SizedBox(
+                            width: 250,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () => _submitLogin(),
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Defaults.bottomColor)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(
+                                      Icons.send,
+                                      size: 25,
                                     ),
-                                  ))),
+                                    SizedBox(
+                                      width: 15,
+                                    ),
+                                    Text(
+                                      'Download',
+                                      style: TextStyle(fontSize: 25),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -129,22 +128,25 @@ class _UpdateDataPageState extends State<UpdateDataPage> {
 
   Future<void> _submitLogin() async {
     LoadingIndicatorDialog().show(context);
-    var statusCode = await apiService.getAllClients();
-    if (statusCode == 200) {
-      //load customer
-      List<Customer> customers = await apiService.getAllClients();
-      for (var customer in customers) {
-        dbHandler.SaveCustomer(customer);
-        for (var contract in customer.contracts) {
-          contract.client_id = customer.reference.toString();
-          dbHandler.SaveContract(contract);
-        }
+
+    try {
+      List<Contract> _contracts = await apiService.getAllContracts();
+
+      for (var contrat in _contracts) {
+        await dbHandler.deleteAllContracts(contrat);
       }
+
+      for (var contract in _contracts) {
+        dbHandler.SaveContract(contract);
+      }
+
+      LoadingIndicatorDialog().dismiss();
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text(
-            'SUCCESS',
+            'SUCESSO',
             textAlign: TextAlign.center,
           ),
           content: SizedBox(
@@ -159,7 +161,7 @@ class _UpdateDataPageState extends State<UpdateDataPage> {
                   height: 100,
                 ),
                 const Text(
-                  'Updating was Successfull',
+                  'Atualisaçao effectua com sucesso',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -171,48 +173,144 @@ class _UpdateDataPageState extends State<UpdateDataPage> {
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (_) => const HomePage()));
                 },
-                child: const Text('GO BACK'))
+                child: const Text('VOLTAR'))
+          ],
+        ),
+      );
+    } catch (e) {
+      LoadingIndicatorDialog().dismiss();
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'ERRO',
+              textAlign: TextAlign.center,
+            ),
+            content: SizedBox(
+              height: 150,
+              child: Column(
+                children: [
+                  Lottie.asset(
+                    'animations/error-dialog.json',
+                    repeat: true,
+                    reverse: true,
+                    fit: BoxFit.cover,
+                    height: 120,
+                  ),
+                  const Text(
+                    'Erro occoreu durante atualiçao',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Tenta de novo'))
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _submitLogin1() async {
+    LoadingIndicatorDialog().show(context);
+    var statusCode = await apiService.getAllContracts();
+    LoadingIndicatorDialog().dismiss(); // Fermer l'indicateur de chargement
+
+    if (statusCode == 200) {
+      _contracts =
+          await apiService.getAllContracts(); // Remplir la liste _contracts
+
+      for (var contrat in _contracts) {
+        await dbHandler.deleteAllContracts(contrat);
+      }
+
+      for (var contract in _contracts) {
+        dbHandler.SaveContract(contract);
+      }
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text(
+            'SUCESSO',
+            textAlign: TextAlign.center,
+          ),
+          content: SizedBox(
+            height: 120,
+            child: Column(
+              children: [
+                Lottie.asset(
+                  'animations/success.json',
+                  repeat: true,
+                  reverse: true,
+                  fit: BoxFit.cover,
+                  height: 100,
+                ),
+                const Text(
+                  'Atualisaçao effectua com sucesso',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (_) => const HomePage()));
+                },
+                child: const Text('VOLTAR'))
           ],
         ),
       );
     } else {
       LoadingIndicatorDialog().dismiss();
-      return showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text(
-                'ERROR',
-                textAlign: TextAlign.center,
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'ERRO',
+              textAlign: TextAlign.center,
+            ),
+            content: SizedBox(
+              height: 150,
+              child: Column(
+                children: [
+                  Lottie.asset(
+                    'animations/error-dialog.json',
+                    repeat: true,
+                    reverse: true,
+                    fit: BoxFit.cover,
+                    height: 120,
+                  ),
+                  const Text(
+                    'Erro occoreu durante atualiçao',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              content: SizedBox(
-                height: 120,
-                child: Column(
-                  children: [
-                    Lottie.asset(
-                      'animations/error-dialog.json',
-                      repeat: true,
-                      reverse: true,
-                      fit: BoxFit.cover,
-                      height: 100,
-                    ),
-                    const Text(
-                      'Error in Acknowledging',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Réessayer'))
-              ],
-            );
-          });
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Tenta de novo'))
+            ],
+          );
+        },
+      );
     }
   }
 }

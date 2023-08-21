@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, depend_on_referenced_packages, use_build_context_synchronously
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, depend_on_referenced_packages, use_build_context_synchronously, unused_field
 
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
@@ -19,9 +19,9 @@ import 'package:uuid/uuid.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key, required this.customer});
+  const PaymentPage({super.key, required this.contract});
 
-  final Customer customer;
+  final Contract contract;
   //final Payment payment;
 
   @override
@@ -35,6 +35,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final storage = locator<TokenStorageService>();
   User? agentConnected;
   var clientId = "";
+  String? statusPayment = "Uploaded to Digital-IT";
 
   String? _selectContract;
   List<Contract> contract = [];
@@ -51,12 +52,8 @@ class _PaymentPageState extends State<PaymentPage> {
     return await storage.retrieveAgentConnected();
   }
 
-  Future<List<Customer>> getAllClient() async {
-    return await dbHandler.readAllClient();
-  }
-
   Future<List<Contract>> getAllContract() async {
-    return await dbHandler.getContractsPerClient(widget.customer.reference);
+    return await dbHandler.readAllContract();
   }
 
   Future<List<Payment>> getAllPayment() async {
@@ -69,9 +66,7 @@ class _PaymentPageState extends State<PaymentPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('------- DATA -------');
 
-      getAllClient().then((value) => setState(() {}));
-
-      clientId = widget.customer.reference.toString();
+      clientId = widget.contract.id.toString();
 
       getAgent().then((value) => setState(() {
             agentConnected = value;
@@ -93,7 +88,7 @@ class _PaymentPageState extends State<PaymentPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Paiement Facture'),
+            const Text('Pagamento de Fatura'),
           ],
         ),
         leading: IconButton(
@@ -118,7 +113,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Information Client',
+                      'Informaçao Cliente',
                       style: TextStyle(
                           color: Defaults.bluePrincipal,
                           fontWeight: FontWeight.bold,
@@ -130,20 +125,11 @@ class _PaymentPageState extends State<PaymentPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                            'Nom et prenoms: ${widget.customer.firstName} ${widget.customer.lastName}'),
+                        Text('Appelido e nome: ${widget.contract.clientName}'),
                         SizedBox(
                           height: 5,
                         ),
-                        Text('Référence: ${widget.customer.reference} '),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('Localité: ${widget.customer.village}'),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('Numéro portable: ${widget.customer.phoneNumber}'),
+                        Text('Offerta: ${widget.contract.offer} '),
                         SizedBox(
                           height: 5,
                         ),
@@ -153,7 +139,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       height: 10,
                     ),
                     Text(
-                      'Information Contrat',
+                      'Informaçao Contrato',
                       style: TextStyle(
                           color: Defaults.bluePrincipal,
                           fontWeight: FontWeight.bold,
@@ -165,39 +151,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        FutureBuilder<List<Contract>>(
-                          future: getAllContract(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text(
-                                  'Erreur lors du chargement des contrats');
-                            } else if (snapshot.data != null &&
-                                snapshot.data!.isEmpty) {
-                              return Text(
-                                  'Aucun contrat trouvé pour ce client');
-                            } else {
-                              return DropdownButton<String>(
-                                value: _selectContract,
-                                hint: const Text('Select contract reference'),
-                                items: snapshot.data!.map((contract) {
-                                  return DropdownMenuItem(
-                                    value: contract.reference,
-                                    child: Text(contract.reference),
-                                  );
-                                }).toList(),
-                                underline: const SizedBox(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectContract = value;
-                                  });
-                                },
-                              );
-                            }
-                          },
-                        ),
+                        Text('Referencia: ${widget.contract.id} '),
                         SizedBox(
                           height: 5,
                         ),
@@ -211,7 +165,8 @@ class _PaymentPageState extends State<PaymentPage> {
                         child: TextFormField(
                           controller: montantverseController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(hintText: 'Montant payé'),
+                          decoration:
+                              InputDecoration(hintText: 'Montante a pagar'),
                         ),
                       ),
                     ),
@@ -233,7 +188,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             children: [
                               Icon(Icons.monetization_on),
                               Text(
-                                'Payer',
+                                'Pagar',
                                 style: TextStyle(fontSize: 20),
                               )
                             ],
@@ -252,73 +207,29 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   onSubmit() async {
-    if (!isUserLoggedIn()) {
-      // L'utilisateur n'est pas connecté, redirigez-le vers la page de connexion.
-      // Vous pouvez utiliser la méthode Navigator.pushReplacement pour le rediriger.
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text(
-                'ALERTE',
-                textAlign: TextAlign.center,
-              ),
-              content: SizedBox(
-                height: 120,
-                child: Column(
-                  children: [
-                    Lottie.asset(
-                      'animations/verif.json',
-                      repeat: true,
-                      reverse: true,
-                      fit: BoxFit.cover,
-                      height: 100,
-                    ),
-                    const Text(
-                      'Veillez-vous connecter  . . .',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
-                  },
-                  child: const Text('Retry'),
-                )
-              ],
-            );
-          });
-      return;
-    }
     if (_formKey.currentState!.validate()) {
-      DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
+      DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: const Text(
-              'CONFIRMATION',
+              'CONFIRMAÇAO',
               textAlign: TextAlign.center,
             ),
             content: SizedBox(
-              height: 120,
+              height: 150,
               child: Column(
                 children: [
                   Lottie.asset(
-                    'animations/verif.json',
+                    'animations/recap.json',
                     repeat: true,
                     reverse: true,
                     fit: BoxFit.cover,
-                    height: 100,
+                    height: 130,
                   ),
                   const Text(
-                    'Voulez-vous payer cette facture ?',
+                    'Queria confirmar o pagamento dessa fatura ?',
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -329,15 +240,10 @@ class _PaymentPageState extends State<PaymentPage> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('Non'),
+                child: const Text('Nao'),
               ),
               TextButton(
                 onPressed: () async {
-                  if (_selectContract == null) {
-                    // Handle the case when no contract is selected.
-                    return;
-                  }
-
                   if (agentConnected == null) {
                     // Handle the case when the agentConnected is null.
                     return;
@@ -350,14 +256,15 @@ class _PaymentPageState extends State<PaymentPage> {
                     // Populate the payment object.
                     id: paymentId,
                     agent: agentConnected!.id,
-                    contract: _selectContract!,
+                    contract: widget.contract.id,
                     amount: double.parse(montantverseController.text),
                     paymentDate: dateFormat.format(DateTime.now()),
+                    status: statusPayment,
                   );
 
                   await dbHandler.SavePayment(payment!);
                   pw.Document docPage1 = await printerService.printEncaissement(
-                      agentConnected!, widget.customer);
+                      agentConnected!, widget.contract);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -367,7 +274,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     ),
                   );
                 },
-                child: const Text('Oui'),
+                child: const Text('Sim'),
               ),
             ],
           );

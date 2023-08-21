@@ -23,7 +23,7 @@ class PrintingPage extends StatelessWidget {
               )),
         ),
         centerTitle: true,
-        title: const Text('Preview Page'),
+        title: const Text('Recibo de Pagamento'),
       ),
       body: PdfPreview(
         build: (format) => docPage.save(),

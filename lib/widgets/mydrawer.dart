@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/di/service_locator.dart';
 import 'package:appfres/models/user.dart';
-import 'package:appfres/ui/pages/login.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -111,18 +112,14 @@ class _MyDrawerState extends State<MyDrawer> {
             child: TextButton.icon(
               // <-- TextButton
               onPressed: () {
-                storage.deleteAllToken();
-                indexClicked = 0;
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()));
+                exit(0);
               },
               icon: const Icon(
                 Icons.power_settings_new_sharp,
                 size: 30.0,
               ),
               label: const Text(
-                'Déconnexion',
+                'Deconexao',
                 style: TextStyle(
                   fontSize: 18,
                 ),

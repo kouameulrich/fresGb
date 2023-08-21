@@ -1,4 +1,4 @@
-package com.example.appfres;
+package com.digitaleit.appfres;
 
 import io.flutter.embedding.android.FlutterActivity;
 

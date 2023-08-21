@@ -1,33 +1,30 @@
 class Contract {
-  late String reference;
+  late String id;
+  late String clientName;
   late String offer;
-  String? type;
-  String? client_id;
 
   Contract({
-    required this.reference,
+    required this.id,
+    required this.clientName,
     required this.offer,
-    required this.type,
-    this.client_id,
   });
 
   Contract.fromJson(Map<String, dynamic> json) {
-    reference = json['reference'];
+    id = json['id'];
+    clientName = json['clientName'];
     offer = json['offer'];
-    type = json['type'];
   }
 
   @override
   String toString() {
-    return 'Contract{reference: $reference, offer: $offer, type: $type, client_id: $client_id}';
+    return 'Contract{id: $id, offer: $offer, client_id: $clientName}';
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['reference'] = reference;
+    data['id'] = id;
+    data['clientName'] = clientName;
     data['offer'] = offer;
-    data['type'] = type;
-    data['client_id'] = client_id;
     return data;
   }
 }

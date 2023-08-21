@@ -6,27 +6,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class TokenStorageService {
   // Create storage
   final FlutterSecureStorage _storage;
-  // static const String TOKEN_KEY = "TOKEN";
-  // static const String TENANT_KEY = "TENANT_ID";
-  // static const String USER_KEY = "USER";
+  static const String TOKEN_KEY = "TOKEN";
   static const String ID_KEY = "MAT";
   static const String EMAIL_KEY = "EMAIL";
   static const String PHONENUMBER_KEY = "PHONENUMBER";
   static const String PASSWORD_KEY = "PASSWORD";
   static const String FIRSTNAME_KEY = "FIRSTNAME";
   static const String LASTNAME_KEY = "LASTNAME";
-  // static const String AUTORISATION_KEY = "AUTORISATION";
-  // static const String ROLE_KEY = "ROLE";
+  static const String LAST_AUTH_DATETIME = "LASTAUTHDATIME";
 
   TokenStorageService(this._storage);
-
-  // void saveToken(String token) async {
-  //   await _storage.write(key: TOKEN_KEY, value: token);
-  // }
-
-  // void saveTenantId(String tenant) async {
-  //   await _storage.write(key: TENANT_KEY, value: tenant);
-  // }
 
   void saveAgentConnected(User agent) async {
     await _storage.write(key: ID_KEY, value: agent.id);
@@ -35,9 +24,10 @@ class TokenStorageService {
     await _storage.write(key: PASSWORD_KEY, value: agent.password);
     await _storage.write(key: FIRSTNAME_KEY, value: agent.firstname);
     await _storage.write(key: LASTNAME_KEY, value: agent.lastname);
-    // await _storage.write(key: AUTORISATION_KEY, value: agent.autorisation);
-    // await _storage.write(
-    //     key: ROLE_KEY, value: agent.role.elementAt(0).toString());
+    await _storage.write(key: TOKEN_KEY, value: agent.token);
+    await _storage.write(
+        key: LAST_AUTH_DATETIME, value: DateTime.now().toString());
+    print(DateTime.now().toString());
   }
 
   Future<User?> retrieveAgentConnected() async {
@@ -47,8 +37,8 @@ class TokenStorageService {
     String? password = await _storage.read(key: PASSWORD_KEY);
     String? firstName = await _storage.read(key: FIRSTNAME_KEY);
     String? lastName = await _storage.read(key: LASTNAME_KEY);
-    // String? autorisation = await _storage.read(key: AUTORISATION_KEY);
-    // String? roles = await _storage.read(key: ROLE_KEY);
+    String? token = await _storage.read(key: TOKEN_KEY);
+    String? lastConnection = await _storage.read(key: LAST_AUTH_DATETIME);
     User agentConnected = User(
       id: id ?? "",
       email: email ?? "",
@@ -56,39 +46,11 @@ class TokenStorageService {
       password: password ?? "",
       firstname: firstName ?? "",
       lastname: lastName ?? "",
-      // autorisation: autorisation ?? "",
-      // role: List.unmodifiable([roles ?? ""])
+      token: token ?? '',
+      lastConnection: lastConnection ?? '',
     );
-    return agentConnected;
+    return (agentConnected);
   }
-
-  // Future<String?> retrieveTenant() async {
-  //   String? tenant = await _storage.read(key: TENANT_KEY);
-  //   if (tenant == null) {
-  //     return null;
-  //   }
-  //   return tenant;
-  // }
-
-  // Future<String?> retrieveAccessToken() async {
-  //   String? tokenJson = await _storage.read(key: TOKEN_KEY);
-  //   if (tokenJson == null) {
-  //     return null;
-  //   }
-  //   return TokenModel.fromJson(jsonDecode(tokenJson)).accessToken;
-  // }
-
-  // Future<String?> retrieveRefreshToken() async {
-  //   String? tokenJson = await _storage.read(key: TOKEN_KEY);
-  //   if (tokenJson == null) {
-  //     return null;
-  //   }
-  //   return TokenModel.fromJson(jsonDecode(tokenJson)).refreshToken;
-  // }
-
-  // Future<bool> isTokenExist() async {
-  //   return await _storage.containsKey(key: TOKEN_KEY);
-  // }
 
   Future<void> deleteAllToken() async {
     _storage.deleteAll();
@@ -96,5 +58,9 @@ class TokenStorageService {
 
   deleteToken(String tokenKey) {
     _storage.delete(key: tokenKey);
+  }
+
+  void saveToken(String token) async {
+    await _storage.write(key: TOKEN_KEY, value: token);
   }
 }

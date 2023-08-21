@@ -47,35 +47,14 @@ class LocalService {
     return users;
   }
 
-  //Save client
-  Future<int> SaveCustomer(Customer customer) async {
-    return await _repository.insertData('client', customer.toJson());
-  }
-
-//Read All Client
-  Future<List<Customer>> readAllClient() async {
-    List<Customer> clients = [];
-    List<Map<String, dynamic>> list = await _repository.readData('client');
-    for (var client in list) {
-      clients.add(Customer.fromJson(client));
-    }
-    return clients;
-  }
-
-//Read All Contract per Client
-  Future<List<Contract>> getContractsPerClient(clientId) async {
-    var sql = "SELECT * FROM contract WHERE client_id = $clientId";
-    List<Contract> contracts = [];
-    List<Map<String, dynamic>> list = await _repository.rawSelect(sql);
-    for (var contract in list) {
-      contracts.add(Contract.fromJson(contract));
-    }
-    return contracts;
-  }
-
   //Save contract
   Future<int> SaveContract(Contract contract) async {
     return await _repository.insertData('contract', contract.toJson());
+  }
+
+  // delete contract
+  deleteAllContracts(Contract contract) async {
+    return await _repository.deleteData('contract', contract.toJson());
   }
 
   Future<List<Contract>> readAllContract() async {

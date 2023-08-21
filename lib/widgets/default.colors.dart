@@ -17,10 +17,10 @@ class Defaults {
   static const Color white = Color.fromARGB(255, 255, 255, 255);
 
   static final drawerItemText = [
-    'Acceuil',
-    'Encaissement',
-    'Transfert des données',
-    'Mise à jour des données',
+    'Inicio',
+    'Coleçao',
+    'Transferencia de data',
+    'Atualisaçao de data',
   ];
 
   static final drawerItemIcon = [

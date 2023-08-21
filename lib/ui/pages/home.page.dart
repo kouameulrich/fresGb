@@ -4,6 +4,7 @@ import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
 import 'package:appfres/models/payment.dart';
 import 'package:appfres/models/user.dart';
+import 'package:appfres/ui/pages/liste.payment.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
 import 'package:appfres/widgets/mydrawer.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
       });
 
       final color = hasInternet ? Colors.green : Colors.red;
-      final text = hasInternet ? 'Connexion internet active' : 'Pas Internet';
+      final text = hasInternet ? 'Conexao activa' : 'Nao ha Internet';
       showSimpleNotification(
         Text(
           text,
@@ -65,14 +66,6 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getAllPayment().then((value) => setState(() {
             _Payment = value;
-            // maleNumber = value
-            //     .where((element) => element.sexeClient == 'Masculin')
-            //     .toList()
-            //     .length;
-            // femaleNumber = value
-            //     .where((element) => element.sexeClient == 'Feminin')
-            //     .toList()
-            //     .length;
             _countEncaissement = _Payment.length;
             _montantRecense = value.fold(
                 0, (value, element) => value.toDouble() + element.amount!);
@@ -99,16 +92,28 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Defaults.blueFondCadre,
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(15, 81, 105, 1),
-          title: const Text('Accueil'),
+          title: const Text('Inicio'),
           bottom: const TabBar(
             indicatorColor: Defaults.greenSelected,
             //indicatorWeight: 5,
             tabs: [
-              Tab(icon: Icon(Icons.list), text: 'Encaissement'),
+              Tab(icon: Icon(Icons.list), text: 'Coleção'),
             ],
           ),
         ),
         drawer: const MyDrawer(),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: Defaults.blueAppBar,
+          foregroundColor: Defaults.white,
+          onPressed: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const PaymentListPage()));
+          },
+          icon: Icon(Icons.add),
+          label: Text('Adicionar um Coleção'),
+        ),
         body: TabBarView(
           children: [
             GridView.count(
@@ -155,13 +160,13 @@ class _HomePageState extends State<HomePage> {
                                     fontWeight: FontWeight.bold),
                               ),
                               const Text(
-                                'Encaissement',
+                                'Coleção',
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Defaults.bluePrincipal),
                               ),
                               const Text(
-                                'totale',
+                                'Total',
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Defaults.bluePrincipal),
@@ -214,13 +219,13 @@ class _HomePageState extends State<HomePage> {
                                     fontWeight: FontWeight.bold),
                               ),
                               const Text(
-                                'Montant',
+                                'Montante',
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Defaults.bluePrincipal),
                               ),
                               const Text(
-                                'totale collecté',
+                                'Totale Coletado',
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Defaults.bluePrincipal),
@@ -232,120 +237,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                //   ListView(
-                //     children: [
-                //       Padding(
-                //         padding: const EdgeInsets.all(8.0),
-                //         child: Container(
-                //           height: 150,
-                //           decoration: BoxDecoration(
-                //             color: Colors.white,
-                //             borderRadius: BorderRadius.circular(8),
-                //             boxShadow: const [
-                //               BoxShadow(
-                //                 color: Colors.black12,
-                //                 offset: Offset(
-                //                   5.0,
-                //                   5.0,
-                //                 ), //Offset
-                //                 blurRadius: 5.0,
-                //                 spreadRadius: 2.0,
-                //               ), //BoxShadow
-                //               BoxShadow(
-                //                 color: Colors.white,
-                //                 offset: Offset(0.0, 0.0),
-                //                 blurRadius: 0.0,
-                //                 spreadRadius: 0.0,
-                //               ), //BoxShadow
-                //             ],
-                //           ),
-                //           child: Center(
-                //             child: Column(
-                //               mainAxisAlignment: MainAxisAlignment.center,
-                //               children: [
-                //                 Text(
-                //                   '$femaleNumber',
-                //                   style: const TextStyle(
-                //                       fontSize: 24,
-                //                       color: Defaults.bluePrincipal,
-                //                       fontWeight: FontWeight.bold),
-                //                 ),
-                //                 const Text(
-                //                   'Client',
-                //                   style: TextStyle(
-                //                       fontSize: 15,
-                //                       color: Defaults.bluePrincipal),
-                //                 ),
-                //                 const Text(
-                //                   'Particulier',
-                //                   style: TextStyle(
-                //                       fontSize: 15,
-                //                       color: Defaults.bluePrincipal),
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   ListView(
-                //     children: [
-                //       Padding(
-                //         padding: const EdgeInsets.all(8.0),
-                //         child: Container(
-                //           height: 150,
-                //           decoration: BoxDecoration(
-                //             color: Colors.white,
-                //             borderRadius: BorderRadius.circular(8),
-                //             boxShadow: const [
-                //               BoxShadow(
-                //                 color: Colors.black12,
-                //                 offset: Offset(
-                //                   5.0,
-                //                   5.0,
-                //                 ), //Offset
-                //                 blurRadius: 5.0,
-                //                 spreadRadius: 2.0,
-                //               ), //BoxShadow
-                //               BoxShadow(
-                //                 color: Colors.white,
-                //                 offset: Offset(0.0, 0.0),
-                //                 blurRadius: 0.0,
-                //                 spreadRadius: 0.0,
-                //               ), //BoxShadow
-                //             ],
-                //           ),
-                //           child: Center(
-                //             child: Column(
-                //               mainAxisAlignment: MainAxisAlignment.center,
-                //               children: [
-                //                 Text(
-                //                   '$maleNumber',
-                //                   style: const TextStyle(
-                //                       fontSize: 24,
-                //                       color: Defaults.bluePrincipal,
-                //                       fontWeight: FontWeight.bold),
-                //                 ),
-                //                 const Text(
-                //                   'Client',
-                //                   style: TextStyle(
-                //                       fontSize: 15,
-                //                       color: Defaults.bluePrincipal),
-                //                 ),
-                //                 const Text(
-                //                   'Entreprise',
-                //                   style: TextStyle(
-                //                       fontSize: 15,
-                //                       color: Defaults.bluePrincipal),
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
               ],
             ),
           ],

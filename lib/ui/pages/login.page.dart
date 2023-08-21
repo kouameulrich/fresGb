@@ -4,6 +4,7 @@ import 'package:appfres/_api/apiService.dart';
 import 'package:appfres/_api/tokenStorageService.dart';
 import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
+import 'package:appfres/models/dto/contract.dart';
 import 'package:appfres/models/dto/customer.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/home.page.dart';
@@ -91,13 +92,13 @@ class _LoginPageState extends State<LoginPage> {
                     controller: usernameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Entrez un nom d\'utilisateur';
+                        return 'Entra nome de usurio';
                       }
                       return null;
                     },
                     decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Entrez votre nom d\'utilisateur'),
+                        hintText: 'Entra nome de usurio'),
                   ),
                 ),
               ),
@@ -121,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Entrez un mot de passe';
+                        return 'Entra senha';
                       }
                       return null;
                     },
@@ -137,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                               });
                             }),
                         border: InputBorder.none,
-                        hintText: 'Entrez votre mot de passe'),
+                        hintText: 'Entra senha'),
                   ),
                 ),
               ),
@@ -151,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Defaults.bottomColor,
                       ),
-                      child: const Text('Connexion',
+                      child: const Text('Conexao',
                           style: TextStyle(color: Colors.white, fontSize: 25)),
                       onPressed: () async {
                         _submitLogin();
@@ -171,15 +172,11 @@ class _LoginPageState extends State<LoginPage> {
       var statusCode = await authService.authenticateUser(
           usernameController.text.trim(), passwordController.text.trim());
       if (statusCode == 200) {
-        //load customer
-        List<Customer> customers = await apiService.getAllClients();
-        for (var customer in customers) {
-          dbHandler.SaveCustomer(customer);
-          for (var contract in customer.contracts) {
-            contract.client_id = customer.reference.toString();
-            dbHandler.SaveContract(contract);
-          }
-        }
+        //LOAD CONTRACT
+        // List<Contract> contracts = await apiService.getAllContracts();
+        // for (var contract in contracts) {
+        //   dbHandler.SaveContract(contract);
+        // }
 
         LoadingIndicatorDialog().dismiss();
         Navigator.push(
@@ -187,41 +184,44 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         LoadingIndicatorDialog().dismiss();
         return showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text(
-                  'ERROR',
-                  textAlign: TextAlign.center,
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                'ERROR',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: SizedBox(
+                height: 170,
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'animations/not_found.json',
+                      repeat: true,
+                      reverse: true,
+                      fit: BoxFit.cover,
+                      height: 150,
+                    ),
+                    const Text(
+                      'Usuario ou Senha Incorreto',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
-                content: SizedBox(
-                  height: 120,
-                  child: Column(
-                    children: [
-                      Lottie.asset(
-                        'animations/auth.json',
-                        repeat: true,
-                        reverse: true,
-                        fit: BoxFit.cover,
-                        height: 100,
-                      ),
-                      const Text(
-                        'Incorrect username and or password',
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('Retry'))
-                ],
-              );
-            });
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Tenta Mais'))
+              ],
+            );
+          },
+        );
       }
     }
   }

@@ -14,39 +14,28 @@ class ApiService {
   final DioClient _dioClient;
   ApiService(this._dioClient);
 
-  Future<User> getUserConnected(String trim) async {
-    String agentEndpoint = 'http://192.168.1.8:8080/api/auth/signin';
-    final response = await _dioClient.post(agentEndpoint);
-    return User.fromJson(response.data);
-  }
+  // Future<User> getUserConnected(String username) async {
+  //   String agentEndpoint = 'api/auth/signin/';
+  //   final response = await _dioClient.post(agentEndpoint);
+  //   return User.fromJson(response.data);
+  // }
 
   Future<List<Contract>> getAllContracts() async {
-    String contractEndpoints = '/api/public/allContracts';
-    final response = await _dioClient.get(contractEndpoints);
-    List<dynamic> data = response.data;
-    List<Contract> contrat = data.map((e) => Contract.fromJson(e)).toList();
+    final response = await _dioClient.get(Endpoints.contracts);
+    List<Contract> contrat =
+        (response.data as List).map((e) => Contract.fromJson(e)).toList();
     return contrat;
   }
 
-  Future<List<Customer>> getAllClients() async {
-    String clientsEndpoints = '/api/public/allClient';
-    final response = await _dioClient.get(clientsEndpoints);
-    List<dynamic> data = response.data;
-    List<Customer> customer = data.map((e) => Customer.fromJson(e)).toList();
-    return customer;
-  }
-
   Future<List<User>> getAllUsers() async {
-    String UserEndpoints = '/api/public/allUsers';
-    final response = await _dioClient.get(UserEndpoints);
-    List<dynamic> data = response.data;
-    List<User> users = data.map((e) => User.fromJson(e)).toList();
+    final response = await _dioClient.get(Endpoints.users);
+    List<User> users =
+        (response.data as List).map((e) => User.fromJson(e)).toList();
     return users;
   }
 
   Future<List<Payment>> getAllPayments() async {
-    String paymentFactureEndpoints = '/api/public/allPayments';
-    final response = await _dioClient.get(paymentFactureEndpoints);
+    final response = await _dioClient.get(Endpoints.payments);
     List<Payment> payments =
         (response.data as List).map((e) => Payment.fromJson(e)).toList();
     return payments;
@@ -71,6 +60,7 @@ class ApiService {
         contract: p.contract,
         amount: p.amount,
         paymentDate: p.paymentDate,
+        status: p.status,
       );
       paymentdtos.add(p1);
     }

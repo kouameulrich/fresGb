@@ -2,11 +2,11 @@
     package="com.example.appfres">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="FresGB Mobile"
+        android:label="Fres Mobile"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name=".MainActivity"
+            android:name="com.digitaleit.appfres.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

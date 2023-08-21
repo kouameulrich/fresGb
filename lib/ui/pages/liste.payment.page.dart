@@ -6,7 +6,6 @@ import 'package:appfres/db/local.service.dart';
 import 'package:appfres/di/service_locator.dart';
 import 'package:appfres/misc/printer.service.dart';
 import 'package:appfres/models/dto/contract.dart';
-import 'package:appfres/models/dto/customer.dart';
 import 'package:appfres/models/user.dart';
 import 'package:appfres/ui/pages/payment.page.dart';
 import 'package:appfres/widgets/default.colors.dart';
@@ -29,13 +28,16 @@ class _PaymentListPageState extends State<PaymentListPage> {
   User? agentConnected;
 
   //------ client declaration ------
-  Customer? customer;
-  List<Customer> _customers = [];
-  int _countCustomer = 0;
-  final int _countCustomerPay = 0;
+  // Customer? customer;
+  // List<Customer> _customers = [];
+  // int _countCustomer = 0;
+  // final int _countCustomerPay = 0;
 
   String? _selectContract;
-  List<Contract> contract = [];
+  List<Contract> _contracts = [];
+  Contract? contract;
+  int _countContract = 0;
+  final int _countContractPay = 0;
 
   TextEditingController searchController = TextEditingController();
 
@@ -43,36 +45,46 @@ class _PaymentListPageState extends State<PaymentListPage> {
     return await storage.retrieveAgentConnected();
   }
 
-  Future<List<Customer>> getAllClient() async {
-    return await dbHandler.readAllClient();
+  Future<List<Contract>> getAllContract() async {
+    return await dbHandler.readAllContract();
   }
 
-  Future<List<Contract>> getAllContract() async {
-    return await dbHandler.getContractsPerClient(_customers);
-  }
+  // Future<List<Contract>> getAllContract() async {
+  //   return await dbHandler.getContractsPerClient(_customers);
+  // }
 
   String _searchText = ''; // Variable pour stocker le texte de recherche
 
   void filterClients(String searchText) {
     setState(() {
       _searchText = searchText; // Met à jour le texte de recherche
-      _customers = _customers
+      _contracts = _contracts
           .where((element) =>
-              element.phoneNumber!.contains(searchText) ||
-              element.firstName!
+              element.offer!.contains(searchText) ||
+              element.id
                   .toLowerCase()
                   .contains(searchText.toString().toLowerCase()) ||
-              element.lastName!
+              element.clientName!
                   .toLowerCase()
-                  .contains(searchText.toString().toLowerCase()) ||
-              element.reference!
-                  .toString()
-                  .toLowerCase()
-                  .contains(searchText.toLowerCase()))
+                  .contains(searchText.toString().toLowerCase()))
           .toList();
-      _countCustomer = _customers.length;
+      _countContract = _contracts.length;
     });
   }
+
+  // @override
+  // void initState() {
+  //   _futureAgentConnected = getAgent();
+  //   print('------- DATA -------');
+  //   print(_contracts);
+
+  //   getAllContract().then(
+  //     (value) => _contracts = value,
+  //   );
+
+  //   getAgent().then((value) => agentConnected = value);
+  //   super.initState();
+  // }
 
   @override
   void initState() {
@@ -81,9 +93,9 @@ class _PaymentListPageState extends State<PaymentListPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('------- DATA -------');
 
-      getAllClient().then((value) => setState(() {
-            _countCustomer = value.length;
-            _customers = value;
+      getAllContract().then((value) => setState(() {
+            _countContract = value.length;
+            _contracts = value;
             // _contracts.sort();
           }));
 
@@ -108,9 +120,9 @@ class _PaymentListPageState extends State<PaymentListPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Encaissement'),
+            const Text('Coleção'),
             Text(
-              '$_countCustomerPay/$_countCustomer',
+              '$_countContractPay/$_countContract',
               style: TextStyle(color: Colors.white),
             )
           ],
@@ -118,7 +130,7 @@ class _PaymentListPageState extends State<PaymentListPage> {
         centerTitle: true,
       ),
       drawer: MyDrawer(),
-      floatingActionButton: _countCustomerPay == 0
+      floatingActionButton: _countContractPay == 0
           ? Text('')
           : FloatingActionButton(
               onPressed: () {},
@@ -132,105 +144,108 @@ class _PaymentListPageState extends State<PaymentListPage> {
             Padding(
               padding:
                   EdgeInsets.only(left: 20, right: 10, top: 15, bottom: 15),
-              child: _countCustomer == 0
-                  ? Text('')
-                  : TextFormField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        suffixIcon: Icon(Icons.search),
-                        hintText: 'Recherche par client ou contrat',
-                      ),
-                      onChanged: (value) {
-                        filterClients(value);
-                      },
-                    ),
+              child:
+                  // _countContract == 0
+                  //     ? Text('')
+                  // :
+                  TextFormField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.search),
+                  hintText: 'Pesquisa por cliente ou contrato',
+                ),
+                onChanged: (value) {
+                  filterClients(value);
+                },
+              ),
             ),
-            if (_searchText
-                .isNotEmpty) // Affiche les données uniquement si le champ de recherche n'est pas vide
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListTileTheme(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10))),
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) => const Divider(
-                        color: Colors.white,
-                      ),
-                      itemCount: _customers.length,
-                      itemBuilder: (context, index) {
-                        Customer customer = _customers[index];
-                        return Card(
-                          elevation: 10,
-                          margin: EdgeInsets.all(0.0),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                              ),
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${customer.firstName} ${customer.lastName}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Defaults.bluePrincipal,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${customer.village} - ${customer.reference}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Defaults.bluePrincipal,
-                                  ),
-                                ),
-                                Text(
-                                  '${customer.phoneNumber}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Defaults.bluePrincipal,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            // trailing: contract.offer == contract.offer
-                            //     ?
-                            trailing: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.print,
-                                color: Defaults.greenPrincipal,
-                              ),
-                            ),
-                            // : Text(''),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => PaymentPage(
-                                            customer: _customers[index],
-                                          )));
-                            },
-                          ),
-                        );
-                      },
+            // if (_searchText
+            //     .isNotEmpty) // Affiche les données uniquement si le champ de recherche n'est pas vide
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTileTheme(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10))),
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) => const Divider(
+                      color: Colors.white,
                     ),
+                    itemCount: _contracts.length,
+                    itemBuilder: (context, index) {
+                      Contract contract = _contracts[index];
+                      return Card(
+                        elevation: 10,
+                        margin: EdgeInsets.all(0.0),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                            ),
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${contract.clientName}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Defaults.bluePrincipal,
+                                ),
+                              ),
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${contract.id}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Defaults.bluePrincipal,
+                                ),
+                              ),
+                              Text(
+                                '${contract.offer}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Defaults.bluePrincipal,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // trailing: contract.id == contract.offer
+                          //     ? IconButton(
+                          //         onPressed: () {},
+                          //         icon: Icon(
+                          //           Icons.print,
+                          //           color: Defaults.greenPrincipal,
+                          //         ),
+                          //       )
+                          //     : Text(''),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PaymentPage(
+                                  contract: _contracts[index],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
-              )
+              ),
+            ),
           ],
         ),
       ),

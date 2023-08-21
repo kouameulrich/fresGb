@@ -44,8 +44,9 @@ dependencies:
   google_fonts: ^5.0.0
   intl: ^0.18.0
   percent_indicator: ^4.2.2
+  get: ^4.6.5
   open_file: ^3.2.1
-  pdf: ^3.10.4
+  pdf: ^3.9.0
   printing: ^5.10.1
   blue_thermal_printer: ^1.2.3
   lottie: ^2.4.0
@@ -54,6 +55,8 @@ dependencies:
   overlay_support: ^2.1.0
   uuid: ^3.0.7
   shared_preferences: ^2.2.0
+  font_awesome_flutter: ^10.2.1
+  flutter_speed_dial: ^6.2.0
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ class Paymentdto {
   double? amount;
   String? contract;
   String? paymentDate;
+  String? status;
 
   Paymentdto({
     required this.id,
@@ -11,19 +12,21 @@ class Paymentdto {
     required this.contract,
     required this.amount,
     required this.paymentDate,
+    required this.status,
   });
 
   @override
   String toString() {
-    return 'Paymentdto{id: $id, agent: $agent, amount: $amount, contract: $contract, paymentDate: $paymentDate}';
+    return 'Payment{id: $id, agent: $agent, amount: $amount, contract: $contract, paymentDate: $paymentDate, status: $status}';
   }
 
   Paymentdto.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    agent = json['agent'];
-    contract = json['contract'];
+    agent = json['agent'].toString();
+    contract = json['contract'].toString();
     amount = json['amount'];
     paymentDate = json['paymentDate'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -33,6 +36,7 @@ class Paymentdto {
     data['contract'] = contract;
     data['amount'] = amount;
     data['paymentDate'] = paymentDate;
+    data['status'] = status;
     return data;
   }
 }
